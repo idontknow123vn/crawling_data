@@ -14,24 +14,24 @@ def main():
         page_url = f'https://www.booking.com/searchresults.vi.html?ss=%C4%90%C3%A0+N%E1%BA%B5ng&ssne=%C4%90%C3%A0+N%E1%BA%B5ng&ssne_untouched=%C4%90%C3%A0+N%E1%BA%B5ng&label=gen173nr-1FCAEoggI46AdIM1gEaPQBiAEBmAEquAEXyAEM2AEB6AEB-AENiAIBqAIDuAL9sN-2BsACAdICJDkzYjg2NjEwLTEyYmUtNDgzMi04ODFiLTYxZDU2MzY4ODllNNgCBuACAQ&sid=67c37a7529c55ff331b675d4e291635f&aid=304142&lang=vi&sb=1&src_elem=sb&src=searchresults&dest_id=-3712125&dest_type=city&checkin=2024-09-15&checkout=2024-09-17&group_adults=1&no_rooms=1&group_children=0'
         page.goto(page_url, timeout=60000)
         provinces = ["Hà Nội", "TP. Hồ Chí Minh", "Hội An", "Nha Trang", "Phú Quốc", "Quy Nhơn", "Vũng Tàu", "Đà Lạt", "Cần Thơ", "Phú Quốc",
-                     "Cà Mau", "Hạ Long", "Huế", "Mũi Né", "Sapa", "Sóc Trăng", "Vinh", "Đà Lạt", "Điện Biên", "Đồng Hới",
-                     "Hà Giang", "Hà Tĩnh", "Hải Dương", "Hòa Bình", "Kon Tum", "Lạng Sơn", "Ninh Bình", "Phan Thiết", "Phú Yên",
-                     "Quảng Bình", "Quảng Ngãi", "Quảng Trị", "Thanh Hóa", "Tuyên Quang", "Vĩnh Phúc", "Yên Bái", "Bắc Giang", "Bắc Kạn", "Bạc Liêu",
-                     "Nghệ An", "Thanh Hóa", ]
+                     "Cà Mau", "Hạ Long", "Huế", "Mũi Né", "Sapa", "Sóc Trăng", "Vinh", "Đà Lạt", "Điện Biên", "Đồng Hới",]
+                     # "Hà Giang", "Hà Tĩnh", "Hải Dương", "Hòa Bình", "Kon Tum", "Lạng Sơn", "Ninh Bình", "Phan Thiết", "Phú Yên",
+                     # "Quảng Bình", "Quảng Ngãi", "Quảng Trị", "Thanh Hóa", "Tuyên Quang", "Vĩnh Phúc", "Yên Bái", "Bắc Giang", "Bắc Kạn", "Bạc Liêu",
+                     # "Nghệ An",]
 
         hotels_list = []
 
-        for i in range(0, 1):
+        for i in range(0, len(provinces)):
             page.wait_for_load_state('load')
             page_height = page.evaluate("() => document.body.scrollHeight")
 
             # Cuộn xuống nửa trang 3 lần
-            for _ in range(3):
+            for _ in range(8):
                 page.evaluate(f"window.scrollBy(0, {page_height / 2.5})")
                 page.wait_for_load_state('load')
                 if(page.locator('//button[span[text()="Tải thêm kết quả"]]').count() > 0):
                     page.locator('//button[span[text()="Tải thêm kết quả"]]').click()
-                time.sleep(0.75)  # Điều chỉnh thời gian chờ giữa các lần cuộn
+                time.sleep(3)  # Điều chỉnh thời gian chờ giữa các lần cuộn
 
 
             hotels = page.locator('//div[@data-testid="property-card"]').all()
