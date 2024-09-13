@@ -83,7 +83,7 @@ def main():
 
                 hotels_list.append(hotel_dict)
 
-            page.locator('//input[@id=":rh:"]').fill(provinces[i].append(", Vietnam"))
+            page.locator('//input[@id=":rh:"]').fill(provinces[i].join(", Vietnam"))
             time.sleep(0.75)
             page.locator('//button[span[text()="Tìm"]]').click()
 
