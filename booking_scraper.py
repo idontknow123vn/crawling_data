@@ -18,18 +18,19 @@ def main():
         provinces = [
             "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu", "Bắc Ninh", "Bến Tre",
             "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận", "Cà Mau", "Cần Thơ", "Cao Bằng",
-            "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang",
-            "Hà Nam", "Hà Nội", "Hà Tĩnh", "Hải Dương", "Hải Phòng", "Hậu Giang", "Hòa Bình", "Hưng Yên",
-            "Khánh Hòa", "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn", "Lào Cai", "Long An",
-            "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam",
-            "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh", "Thái Bình",
-            "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang", "TP. Hồ Chí Minh", "Trà Vinh",
-            "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+            "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Gia Lai",
+            # "Hà Giang",
+            # "Hà Nam", "Hà Nội", "Hà Tĩnh", "Hải Dương", "Hải Phòng", "Hậu Giang", "Hòa Bình", "Hưng Yên",
+            # "Khánh Hòa", "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn", "Lào Cai", "Long An",
+            # "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam",
+            # "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh", "Thái Bình",
+            # "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang", "TP. Hồ Chí Minh", "Trà Vinh",
+            # "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
         ]
 
         hotels_list = []
 
-        for i in range(0, 1):
+        for i in range(0, len(provinces)):
             page.wait_for_load_state('load')
             page_height = page.evaluate("() => document.body.scrollHeight")
 
@@ -39,7 +40,7 @@ def main():
                 page.wait_for_load_state('load')
                 if(page.locator('//button[span[text()="Tải thêm kết quả"]]').count() > 0):
                     page.locator('//button[span[text()="Tải thêm kết quả"]]').click()
-                time.sleep(1)  # Điều chỉnh thời gian chờ giữa các lần cuộn
+                time.sleep(2)  # Điều chỉnh thời gian chờ giữa các lần cuộn
 
 
             hotels = page.locator('//div[@data-testid="property-card"]').all()
@@ -74,13 +75,15 @@ def main():
                 # print(f'There are: {len(img_descs)} description images in {hotel_dict["hotel"]}.')
                 list_img_descs = []
                 for k in range(0, 2):
+                    if k >= len(img_descs):
+                        break
                     list_img_descs.append(img_descs[k].get_attribute('src').join(", "))
                 hotel_dict['description images'] = "".join(list_img_descs)
                 new_page.close()
 
                 hotels_list.append(hotel_dict)
 
-            page.locator('//input[@id=":rh:"]').fill(provinces[i])
+            page.locator('//input[@id=":rh:"]').fill(provinces[i].append(", Vietnam"))
             time.sleep(0.75)
             page.locator('//button[span[text()="Tìm"]]').click()
 
