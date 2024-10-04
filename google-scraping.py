@@ -54,6 +54,7 @@ def main():
                         food_dict['address'] = food_stores_.locator('//div[@jsname="MZArnb"]/div[3]').inner_text() if food_stores_.locator('//div[@jsname="MZArnb"]/div[3]').count() > 0 else "None"
                         food_dict['score'] = food_stores_.locator('//span[@class="yi40Hd YrbPuc"]').inner_text() if food_stores_.locator('//span[@class="yi40Hd YrbPuc"]').count() > 0 else "Chưa xét"
                         food_dict['reviews count'] = food_stores_.locator('//span[@class="RDApEe YrbPuc"]').inner_text().strip("()") if food_stores_.locator('//span[@class="RDApEe YrbPuc"]').count() > 0 else "0"
+                        food_dict['category'] = food_stores_.locator('//div[@jsname="MZArnb"]/div[2]').inner_text().split("\n")[2][2:] if food_stores_.locator('//span[@class="qptdjc"]').count() > 0 else "None"
                         price_text = page.locator('//div[@class="Neccf"]/div[1]/div[1]/span[2]').inner_text() if page.locator('//div[@class="Neccf"]/div[1]/div[1]/span[2]').count() > 0 else "None"
                         # Tách chuỗi theo ký tự xuống dòng
                         price_and_report = price_text.split('\n')
@@ -87,8 +88,8 @@ def main():
                     time.sleep(1)
                 food_stores.extend(food_stores_per_province_large)
             df = pd.DataFrame(food_stores)
-            df.to_excel('food_store7.xlsx', index=False)
-            df.to_csv('food_store7.csv', index=False)
+            df.to_excel('food_store8.xlsx', index=False)
+            df.to_csv('food_store8.csv', index=False)
             browser.close()
         except Exception as e:
             # df = pd.DataFrame(food_stores)
