@@ -19,12 +19,20 @@ def main():
 
         vietnamProvinces = [
             # "An Giang", "Bà Rịa - Vũng Tàu",
-            # "Bạc Liêu", "Bắc Kạn", "Bắc Giang",
-            # "Bắc Ninh", "Bến Tre", "Bình Dương", "Bình Định", "Bình Phước",
-            # "Bình Thuận", "Cà Mau",
+            # "Bạc Liêu",
+            # # "Bắc Kạn",
+            # "Bắc Giang",
+            # "Bắc Ninh",
+            # "Bến Tre",
+            # "Bình Dương",
+            "Bình Định",
+            # "Bình Phước",
+            "Bình Thuận",
+            # "Cà Mau",
             # "Cao Bằng", "Cần Thơ",
-            "Đà Nẵng",
-            # "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp",
+            # "Đà Nẵng",
+            # "Đắk Lắk", "Đắk Nông",
+            # "Điện Biên", "Đồng Nai", "Đồng Tháp",
             # "Gia Lai", "Hà Giang", "Hà Nam", "Hà Nội", "Hà Tĩnh",
             # "Hải Dương", "Hải Phòng", "Hậu Giang", "Hòa Bình", "Hưng Yên",
             # "Khánh Hòa", "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng",
@@ -43,7 +51,7 @@ def main():
                 time.sleep(1.5)
                 page.press('//input[@id="searchboxinput"]', 'Enter')
 
-                for h in range(0, 1):
+                for h in range(0, 25):
                     page.locator('//div[@aria-label="Kết quả cho quán ăn ở ' + vietnamProvinces[i] + '"]').evaluate(
                         'el => el.scrollTop = el.scrollHeight')
                     time.sleep(2)
@@ -82,9 +90,10 @@ def main():
                     else:
                         break
                     time.sleep(1.5)
-                    data_food_dict['name'] = page.locator('//h1[@class="DUwDvf lfPIob"]').inner_text()
+                    data_food_dict['name'] = page.locator('//h1[@class="DUwDvf lfPIob"]').inner_text() if page.locator(
+                        '//h1[@class="DUwDvf lfPIob"]').count() > 0 else "không có tên??????"
                     data_food_dict['address'] = page.locator(
-                        '//div[@class="Io6YTe fontBodyMedium kR99db fdkmkc "]').nth(0).inner_text()
+                        '//div[@class="Io6YTe fontBodyMedium kR99db fdkmkc "]').nth(0).inner_text() if page.locator('//div[@class="Io6YTe fontBodyMedium kR99db fdkmkc "]').count() > 0 else "Không có địa chỉ"
                     data_food_dict['score'] = page.locator('//div[@class="F7nice "]/span[1]/span[1]').inner_text() if page.locator('//div[@class="F7nice "]/span[1]/span[1]').count() > 0 else "Chưa xét"
                     data_food_dict['reviews count'] = page.locator(
                         '//div[@class="F7nice "]/span[2]/span[1]/span[1]').inner_text().strip("()") if page.locator('//div[@class="F7nice "]/span[2]/span[1]/span[1]').count() > 0 else "0"
@@ -123,7 +132,7 @@ def main():
                     #     data_food_dict['price'] = "Không có giá"
                     #     data_food_dict['discount'] = "Không có giảm giá"
                     page.locator('//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]').nth(0).evaluate(
-                        'el => el.scrollTop = el.scrollHeight')
+                        'el => el.scrollTop = el.scrollHeight') if page.locator('//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]').count() > 0 else None
                     elements_without_aria = page.locator(
                         '//div[@class="LTs0Rc" and @role="group"]').all()
                     data_food_dict['services'] = "None"
@@ -150,13 +159,16 @@ def main():
                         cleaned_url = url.split('=')[0]
                         list_img_descs.append(cleaned_url + ", ")
                     data_food_dict['description images'] = "".join(list_img_descs)
-                    page.locator('//div[@jsname="ZMv3u"]/div[3]').click()
+                    if page.locator('//div[@jsname="ZMv3u"]/div[3]').count() > 0:
+                        page.locator('//div[@jsname="ZMv3u"]/div[3]').click()
+                    else:
+                        page.locator('//canvas[@id]').click()
                     data_food.append(data_food_dict)
 
 
             df = pd.DataFrame(data_food)
-            df.to_excel('data_food.xlsx', index=False)
-            df.to_csv('data_food.csv', index=False)
+            df.to_excel('data_food4.xlsx', index=False)
+            df.to_csv('data_food4.csv', index=False)
             browser.close()
 
         except Exception as e:
