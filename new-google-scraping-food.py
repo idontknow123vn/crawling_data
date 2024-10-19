@@ -19,15 +19,15 @@ def main():
 
         vietnamProvinces = [
             # "An Giang", "Bà Rịa - Vũng Tàu",
-            # "Bạc Liêu",
+            "Bạc Liêu",
             # # "Bắc Kạn",
             # "Bắc Giang",
-            # "Bắc Ninh",
+            "Bắc Ninh",
             # "Bến Tre",
             # "Bình Dương",
-            "Bình Định",
+            # "Bình Định",
             # "Bình Phước",
-            "Bình Thuận",
+            # "Bình Thuận",
             # "Cà Mau",
             # "Cao Bằng", "Cần Thơ",
             # "Đà Nẵng",
@@ -167,8 +167,8 @@ def main():
 
 
             df = pd.DataFrame(data_food)
-            df.to_excel('data_food4.xlsx', index=False)
-            df.to_csv('data_food4.csv', index=False)
+            df.to_excel('data_food2.xlsx', index=False)
+            df.to_csv('data_food2.csv', index=False)
             browser.close()
 
         except Exception as e:
