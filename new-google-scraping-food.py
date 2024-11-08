@@ -19,10 +19,10 @@ def main():
 
         vietnamProvinces = [
             # "An Giang", "Bà Rịa - Vũng Tàu",
-            "Bạc Liêu",
-            # # "Bắc Kạn",
+            # "Bạc Liêu",
+            # "Bắc Kạn",
             # "Bắc Giang",
-            "Bắc Ninh",
+            # "Bắc Ninh",
             # "Bến Tre",
             # "Bình Dương",
             # "Bình Định",
@@ -30,7 +30,7 @@ def main():
             # "Bình Thuận",
             # "Cà Mau",
             # "Cao Bằng", "Cần Thơ",
-            # "Đà Nẵng",
+            "Đà Nẵng",
             # "Đắk Lắk", "Đắk Nông",
             # "Điện Biên", "Đồng Nai", "Đồng Tháp",
             # "Gia Lai", "Hà Giang", "Hà Nam", "Hà Nội", "Hà Tĩnh",
@@ -40,7 +40,8 @@ def main():
             # "Ninh Bình", "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình",
             # "Quảng Nam", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sóc Trăng",
             # "Sơn La", "Tây Ninh", "Thái Bình", "Thái Nguyên", "Thanh Hóa",
-            # "Thừa Thiên Huế", "Tiền Giang", "TP Hồ Chí Minh", "Trà Vinh", "Tuyên Quang",
+            "Thừa Thiên Huế",
+            # "Tiền Giang", "TP Hồ Chí Minh", "Trà Vinh", "Tuyên Quang",
             # "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
         ]
         data_food = []
@@ -51,19 +52,26 @@ def main():
                 time.sleep(1.5)
                 page.press('//input[@id="searchboxinput"]', 'Enter')
 
+
+
                 for h in range(0, 25):
                     page.locator('//div[@aria-label="Kết quả cho quán ăn ở ' + vietnamProvinces[i] + '"]').evaluate(
                         'el => el.scrollTop = el.scrollHeight')
                     time.sleep(2)
+
+                while page.locator('//button[@id="widget-zoom-in"]').is_enabled():
+                    page.locator('//button[@id="widget-zoom-in"]').click()
+                    time.sleep(0.5)
+
                 data_food_province_small = page.locator('//div[@class="Nv2PK THOPZb CpccDe "]').all()
                 for index, data_food_province in enumerate(data_food_province_small):
                     data_food_dict = {}
-                    map_canvas = page.locator('//canvas[@id]')
+                    map_canvas = page.locator('//canvas[@id]').first
                     map_box = map_canvas.bounding_box()
 
                     if map_box:
                         # Số lần kéo
-                        drag_times = 3
+                        drag_times = 5
                         drag_distance = 200  # Khoảng cách kéo mỗi lần (pixels)
 
                         for _ in range(drag_times):
@@ -89,6 +97,12 @@ def main():
                         time.sleep(3)
                     else:
                         break
+
+                    if (page.locator('//label[@id="U5ELMd"]').inner_text() != "5 mét"):
+                        while page.locator('//button[@id="widget-zoom-in"]').is_enabled():
+                            page.locator('//button[@id="widget-zoom-in"]').click()
+                            time.sleep(0.5)
+
                     time.sleep(1.5)
                     data_food_dict['name'] = page.locator('//h1[@class="DUwDvf lfPIob"]').inner_text() if page.locator(
                         '//h1[@class="DUwDvf lfPIob"]').count() > 0 else "không có tên??????"
@@ -97,21 +111,21 @@ def main():
                     data_food_dict['score'] = page.locator('//div[@class="F7nice "]/span[1]/span[1]').inner_text() if page.locator('//div[@class="F7nice "]/span[1]/span[1]').count() > 0 else "Chưa xét"
                     data_food_dict['reviews count'] = page.locator(
                         '//div[@class="F7nice "]/span[2]/span[1]/span[1]').inner_text().strip("()") if page.locator('//div[@class="F7nice "]/span[2]/span[1]/span[1]').count() > 0 else "0"
-                    current_url = page.url
-
-                    # Trích xuất tọa độ từ URL
-                    regex = r"@(-?\d+\.\d+),(-?\d+\.\d+)"
-                    match = re.search(regex, current_url)
-
-                    if match:
-                        latitude = match.group(1)
-                        longitude = match.group(2)
-
-                        data_food_dict['latitude'] = latitude
-                        data_food_dict['longitude'] = longitude
-                    else:
-                        data_food_dict['latitude'] = "None"
-                        data_food_dict['longitude'] = "None"
+                    # current_url = page.url
+                    #
+                    # # Trích xuất tọa độ từ URL
+                    # regex = r"@(-?\d+\.\d+),(-?\d+\.\d+)"
+                    # match = re.search(regex, current_url)
+                    #
+                    # if match:
+                    #     latitude = match.group(1)
+                    #     longitude = match.group(2)
+                    #
+                    #     data_food_dict['latitude'] = latitude
+                    #     data_food_dict['longitude'] = longitude
+                    # else:
+                    #     data_food_dict['latitude'] = "None"
+                    #     data_food_dict['longitude'] = "None"
                     data_food_dict['province'] = vietnamProvinces[i]
                     data_food_dict['category'] = page.locator(
                         '//button[@class="DkEaL "]').inner_text() if page.locator(
@@ -162,13 +176,33 @@ def main():
                     if page.locator('//div[@jsname="ZMv3u"]/div[3]').count() > 0:
                         page.locator('//div[@jsname="ZMv3u"]/div[3]').click()
                     else:
-                        page.locator('//canvas[@id]').click()
+                        page.locator('//canvas[@id]').first.click()
+
+                    map_canvas = page.locator('//canvas[@id]').first
+                    map_box = map_canvas.bounding_box()
+
+
+                    # Kéo thả chuột sang bên trái 1/4 chiều rộng của map_box
+                    # page.mouse.move(map_box['x'] + (3 * map_box['width'] / 4), map_box['y'] + map_box['height'] / 2)
+                    # Perform a right-click
+                    page.mouse.click(
+                        map_box['x'] + (4.976 * map_box['width'] / 6),  # x-coordinate
+                        map_box['y'] + (map_box['height'] / 2),  # y-coordinate
+                        button='right'  # Specify right button click
+                    )
+
+                    coordinators = page.locator('//div[@class="mLuXec"]').first.inner_text().split(', ')
+                    data_food_dict['latitude'] = coordinators[0]
+                    data_food_dict['longitude'] = coordinators[1]
+                    time.sleep(1)
+                    print(data_food_dict)
+
                     data_food.append(data_food_dict)
 
 
             df = pd.DataFrame(data_food)
-            df.to_excel('data_food2.xlsx', index=False)
-            df.to_csv('data_food2.csv', index=False)
+            df.to_excel('data_food_sample.xlsx', index=False)
+            df.to_csv('data_food_sample.csv', index=False)
             browser.close()
 
         except Exception as e:

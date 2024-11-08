@@ -9,7 +9,8 @@ def main():
 
         browser = p.chromium.launch(headless=False)
         context = browser.new_context(
-            locale='vi-VN'
+            locale='vi-VN',
+
         )
         page = context.new_page()
 
@@ -22,15 +23,15 @@ def main():
             # "Bạc Liêu",
             # "Bắc Kạn",
             # "Bắc Giang",
-            # "Bắc Ninh",
-            # "Bến Tre",
-            # "Bình Dương",
-            # "Bình Định",
-            # "Bình Phước",
+            "Bắc Ninh",
+            "Bến Tre",
+            "Bình Dương",
+            "Bình Định",
+            "Bình Phước",
             # "Bình Thuận",
             # "Cà Mau",
             # "Cao Bằng", "Cần Thơ",
-            "Đà Nẵng",
+            # "Đà Nẵng",
             # "Đắk Lắk", "Đắk Nông",
             # "Điện Biên", "Đồng Nai", "Đồng Tháp",
             # "Gia Lai", "Hà Giang", "Hà Nam", "Hà Nội", "Hà Tĩnh",
@@ -40,20 +41,22 @@ def main():
             # "Ninh Bình", "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình",
             # "Quảng Nam", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sóc Trăng",
             # "Sơn La", "Tây Ninh", "Thái Bình", "Thái Nguyên", "Thanh Hóa",
-            "Thừa Thiên Huế",
+            # "Thừa Thiên Huế",
             # "Tiền Giang", "TP Hồ Chí Minh", "Trà Vinh", "Tuyên Quang",
             # "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
         ]
-        data_hotel = []
+        data_attraction = []
         try:
             for i in range(0, len(vietnamProvinces)):
                 page.wait_for_load_state('load')
-                page.locator('//input[@id="searchboxinput"]').fill("khách sạn ở " + vietnamProvinces[i])
+                page.locator('//input[@id="searchboxinput"]').fill("điểm du lịch ở " + vietnamProvinces[i])
                 time.sleep(1.5)
                 page.press('//input[@id="searchboxinput"]', 'Enter')
+                time.sleep(1)
 
-                for h in range(0, 27):
-                    page.locator('//div[@aria-label="Kết quả cho khách sạn ở ' + vietnamProvinces[i] + '"]').evaluate(
+
+                for h in range(0, 15):
+                    page.locator('//div[@aria-label="Kết quả cho điểm du lịch ở ' + vietnamProvinces[i] + '"]').evaluate(
                         'el => el.scrollTop = el.scrollHeight')
                     time.sleep(2)
 
@@ -61,15 +64,15 @@ def main():
                     page.locator('//button[@id="widget-zoom-in"]').click()
                     time.sleep(0.5)
 
-                data_hotel_province_small = page.locator('//div[@class="Nv2PK THOPZb CpccDe "]').all()
-                for index, data_hotel_province in enumerate(data_hotel_province_small):
-                    data_hotel_dict = {}
+                data_attraction_province_small = page.locator('//div[@class="Nv2PK THOPZb CpccDe "]').all()
+                for index, data_attraction_province in enumerate(data_attraction_province_small):
+                    data_attraction_dict = {}
                     map_canvas = page.locator('//canvas[@id]').first
                     map_box = map_canvas.bounding_box()
 
                     if map_box:
                         # Số lần kéo
-                        drag_times = 3
+                        drag_times = 5
                         drag_distance = 200  # Khoảng cách kéo mỗi lần (pixels)
 
                         for _ in range(drag_times):
@@ -80,7 +83,7 @@ def main():
                             page.mouse.down()
 
                             # Kéo bản đồ sang phải
-                            page.mouse.move(map_box['x'] + map_box['width'] / 2 + drag_distance,
+                            page.mouse.move(map_box['x'] + map_box['width'] / 2 - drag_distance,
                                             map_box['y'] + map_box['height'] / 2, steps=10)
 
                             # Thả chuột ra để hoàn thành kéo
@@ -90,53 +93,44 @@ def main():
                             page.wait_for_timeout(1000)  # Đợi 1 giây
                     else:
                         print("Không tìm thấy bản đồ")
+
                     if page.locator('//div[@class="Nv2PK THOPZb CpccDe "]').nth(index).count() > 0:
                         page.locator('//div[@class="Nv2PK THOPZb CpccDe "]').nth(index).click()
                         time.sleep(3)
                     else:
                         break
-
                     if (page.locator('//label[@id="U5ELMd"]').inner_text() != "5 mét"):
                         while page.locator('//button[@id="widget-zoom-in"]').is_enabled():
                             page.locator('//button[@id="widget-zoom-in"]').click()
                             time.sleep(0.5)
 
                     time.sleep(1.5)
-                    data_hotel_dict['name'] = page.locator('//h1[@class="DUwDvf lfPIob"]').inner_text() if page.locator('//h1[@class="DUwDvf lfPIob"]').count() > 0 else "không có tên??????"
-                    data_hotel_dict['address'] = page.locator(
+                    data_attraction_dict['name'] = page.locator('//h1[@class="DUwDvf lfPIob"]').inner_text() if page.locator(
+                        '//h1[@class="DUwDvf lfPIob"]').count() > 0 else "không có tên??????"
+                    data_attraction_dict['address'] = page.locator(
                         '//div[@class="Io6YTe fontBodyMedium kR99db fdkmkc "]').nth(0).inner_text() if page.locator('//div[@class="Io6YTe fontBodyMedium kR99db fdkmkc "]').count() > 0 else "Không có địa chỉ"
-                    data_hotel_dict['score'] = page.locator('//div[@class="F7nice "]/span[1]/span[1]').inner_text() if page.locator('//div[@class="F7nice "]/span[1]/span[1]').count() > 0 else "Chưa xét"
-                    data_hotel_dict['reviews count'] = page.locator(
+                    data_attraction_dict['score'] = page.locator('//div[@class="F7nice "]/span[1]/span[1]').inner_text() if page.locator('//div[@class="F7nice "]/span[1]/span[1]').count() > 0 else "Chưa xét"
+                    data_attraction_dict['reviews count'] = page.locator(
                         '//div[@class="F7nice "]/span[2]/span[1]/span[1]').inner_text().strip("()") if page.locator('//div[@class="F7nice "]/span[2]/span[1]/span[1]').count() > 0 else "0"
 
-                    data_hotel_dict['province'] = vietnamProvinces[i]
-                    data_hotel_dict['category'] = page.locator(
-                        '//span[@class="mgr77e"]/span[1]/span[2]/span[1]/span[1]').inner_text() if page.locator(
-                        '//span[@class="mgr77e"]/span[1]/span[2]/span[1]/span[1]').count() > 0 else "Khách sạn"
+                    data_attraction_dict['province'] = vietnamProvinces[i]
+                    data_attraction_dict['category'] = page.locator(
+                        '//button[@class="DkEaL "]').inner_text() if page.locator(
+                        '//button[@class="DkEaL "]').count() > 0 else "None"
 
-                    if page.locator('//span[@class="fontBodySmall A1XLKe"]').count() > 0:
-                        data_hotel_dict['price'] = page.locator(
-                            '//span[@class="fontTitleLarge FhDxwe"]').inner_text().replace('\u00a0', ' ').strip()
-                        data_hotel_dict['discount'] = page.locator('//span[@class="fontBodySmall A1XLKe"]').inner_text()
-                    elif page.locator('//span[@class="fontTitleLarge Cbys4b"]').count() > 0:
-                        data_hotel_dict['price'] = page.locator(
-                            '//span[@class="fontTitleLarge Cbys4b"]').inner_text().replace('\u00a0', ' ').strip()
-                        data_hotel_dict['discount'] = "Không có giảm giá"
-                    else:
-                        data_hotel_dict['price'] = "Không có giá"
-                        data_hotel_dict['discount'] = "Không có giảm giá"
-                    if page.locator('//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]'). count() > 0:
-                        page.locator('//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]').nth(0).evaluate(
-                            'el => el.scrollTop = el.scrollHeight')
+                    data_attraction_dict['price'] = page.locator("//div[@class='S8e5r']/div[2]").first.inner_text() if page.locator("//div[@class='S8e5r']/div[2]").count() > 0 else "Không có giá"
+
+                    page.locator('//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]').nth(0).evaluate(
+                        'el => el.scrollTop = el.scrollHeight') if page.locator('//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]').count() > 0 else None
                     elements_without_aria = page.locator(
-                        "//div[contains(@class, 'CK16pd dc6iWb')][not(@aria-disabled)]").all()
-                    data_hotel_dict['services'] = "None"
+                        '//div[@class="LTs0Rc" and @role="group"]').all()
+                    data_attraction_dict['services'] = "None"
                     services = ""
                     if len(elements_without_aria) > 0:
                         for element in elements_without_aria:
-                            service = element.locator('//span[@class="fontBodySmall gSamH"]').inner_text()
+                            service = element.locator('//div[@aria-hidden]').inner_text()
                             services += service + ", "
-                    data_hotel_dict['services'] = services
+                    data_attraction_dict['services'] = services
                     img_descs = page.locator('//img[@class="DaSXdd"]').all()
                     list_img_descs = []
                     for k in range(0, 4):
@@ -153,7 +147,8 @@ def main():
                         # Loại bỏ các tham số không cần thiết (ví dụ: w130-h87-n-k-no)
                         cleaned_url = url.split('=')[0]
                         list_img_descs.append(cleaned_url + ", ")
-                    data_hotel_dict['description images'] = "".join(list_img_descs)
+                    data_attraction_dict['description images'] = "".join(list_img_descs)
+
                     if page.locator('//div[@jsname="ZMv3u"]/div[3]').count() > 0:
                         page.locator('//div[@jsname="ZMv3u"]/div[3]').click()
                     else:
@@ -161,6 +156,7 @@ def main():
 
                     map_canvas = page.locator('//canvas[@id]').first
                     map_box = map_canvas.bounding_box()
+
 
                     # Kéo thả chuột sang bên trái 1/4 chiều rộng của map_box
                     # page.mouse.move(map_box['x'] + (3 * map_box['width'] / 4), map_box['y'] + map_box['height'] / 2)
@@ -172,24 +168,24 @@ def main():
                     )
 
                     coordinators = page.locator('//div[@class="mLuXec"]').first.inner_text().split(', ')
-                    data_hotel_dict['latitude'] = coordinators[0]
-                    data_hotel_dict['longitude'] = coordinators[1]
+                    data_attraction_dict['latitude'] = coordinators[0]
+                    data_attraction_dict['longitude'] = coordinators[1]
+
 
                     time.sleep(1)
-                    print(data_hotel_dict)
+                    print(data_attraction_dict)
+                    data_attraction.append(data_attraction_dict)
 
-                    data_hotel.append(data_hotel_dict)
 
-
-            df = pd.DataFrame(data_hotel)
-            df.to_excel('data_hotel_sample_2.xlsx', index=False)
-            df.to_csv('data_hotel_sample_2.csv', index=False)
+            df = pd.DataFrame(data_attraction)
+            df.to_excel('data_attraction.xlsx', index=False)
+            df.to_csv('data_attraction3.csv', index=False)
             browser.close()
 
         except Exception as e:
-            # df = pd.DataFrame(food_stores)
-            # df.to_excel('food_store1.xlsx', index=False)
-            # df.to_csv('food_store1.csv', index=False)
+            # df = pd.DataFrame(attraction_stores)
+            # df.to_excel('attraction_store1.xlsx', index=False)
+            # df.to_csv('attraction_store1.csv', index=False)
             print(e)
 
 
